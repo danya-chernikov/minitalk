@@ -5,18 +5,18 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/30 18:41:26 by dchernik          #+#    #+#             */
-/*   Updated: 2024/10/11 16:54:03 by dchernik         ###   ########.fr       */
+/*   Created: 2025/03/28 04:35:25 by dchernik          #+#    #+#             */
+/*   Updated: 2025/06/13 17:27:29 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+
+#include <stddef.h>
 #include <stdlib.h>
 
 static char	*itoa_alloc(int size);
 static void	itoa_sign_check(char *buf, int n, int *i);
-static char	*itoa_reverse(char *str, int slen);
-static int	count_digits(int n);
 
 char	*ft_itoa(int n)
 {
@@ -33,7 +33,7 @@ char	*ft_itoa(int n)
 		num = -num;
 		dnum = 1;
 	}
-	buf = itoa_alloc(dnum + count_digits(n) + 1);
+	buf = itoa_alloc(dnum + ft_count_digits(n) + 1);
 	if (buf == NULL)
 		return (NULL);
 	while (num != 0)
@@ -44,22 +44,7 @@ char	*ft_itoa(int n)
 	}
 	itoa_sign_check(buf, n, &i);
 	buf[i] = '\0';
-	return (itoa_reverse(buf, i));
-}
-
-static int	count_digits(int n)
-{
-	int	num;
-
-	num = 0;
-	if (n == 0)
-		return (1);
-	while (n != 0)
-	{
-		n = n / 10;
-		num++;
-	}
-	return (num);
+	return (ft_reverse_str(buf));
 }
 
 static char	*itoa_alloc(int size)
@@ -84,20 +69,4 @@ static void	itoa_sign_check(char *buf, int n, int *i)
 		buf[*i] = '-';
 		(*i)++;
 	}
-}
-
-static char	*itoa_reverse(char *str, int slen)
-{
-	int	q;
-	int	tmp;
-
-	q = 0;
-	while (q < slen / 2)
-	{
-		tmp = str[q];
-		str[q] = str[slen - q - 1];
-		str[slen - q - 1] = tmp;
-		q++;
-	}
-	return (str);
 }

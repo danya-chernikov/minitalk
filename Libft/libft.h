@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 18:40:28 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/13 15:26:11 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/13 17:39:45 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 # define LIBFT_H
 
 # include <stddef.h>
+# include <stdarg.h>
 
+/* get_next_line defines */
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 42
 # endif
@@ -48,12 +50,19 @@
 # define BREAK			2
 # define CONT			3
 
+/* Lists defines */
 typedef struct s_list
 {
 	void			*content;
 	struct s_list	*next;
 }	t_list;
 
+/* Newly added functions */
+char		*ft_int_to_hex(unsigned long long num, int dcase);
+char		*ft_reverse_str(char *str);
+int			ft_count_digits(long long n);
+
+/* get_next_line functions */
 /* get_next_line.c */
 char		*get_next_line(int fd);
 int			loop_alg(char *buf, char **line, long long *v, int *flags);
@@ -68,6 +77,8 @@ int			alloc_mem(char **line, long long *v, int *flags);
 void		check_reaching_end(long long *v, int *flags);
 void		clear_func_state(char **line, long long *v, int *flags);
 
+/* Original Libft functions */
+/* First part */
 int			ft_isalpha(int c);
 int			ft_isdigit(int c);
 int			ft_isalnum(int c);
@@ -91,6 +102,7 @@ int			ft_memcmp(const void *s1, const void *s2, size_t n);
 void		*ft_calloc(size_t nmemb, size_t size);
 char		*ft_strdup(const char *s);
 
+/* Second part */
 int			ft_atoi(const char *nptr);
 char		*ft_itoa(int n);
 char		**ft_split(char const *s, char c);
@@ -104,6 +116,7 @@ void		ft_striteri(char *s, void (*f)(unsigned int, char *));
 char		*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 char		*ft_substr(char const *s, unsigned int start, size_t len);
 
+/* Lists */
 t_list		*ft_lstnew(void *content);
 void		ft_lstadd_front(t_list **lst, t_list *new);
 int			ft_lstsize(t_list *lst);
@@ -114,5 +127,33 @@ void		ft_lstclear(t_list **lst, void (*del)(void *));
 void		ft_lstiter(t_list *lst, void (*f)(void *));
 t_list		*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 void		ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)());
+
+/* printf functions */
+/* ft_printf.c */
+int			ft_printf(char const *format, ...);
+int			parse_format_str(char const *format, va_list *vl, int *pbytes);
+int			process_percent(char const *format, va_list *vl, int *pbytes, int *i);
+int			process_not_percent(char const *f, va_list *vl, void **pack);
+int			process_conv(char const *format, va_list *vl, int cpos);
+
+/* non_numeric.c */
+int			char_conv(va_list *vl);
+int			string_conv(va_list *vl);
+int			ptr_conv(va_list *vl);
+
+/* numeric.c */
+int			nbr_conv(va_list *vl);
+int			u_nbr_conv(va_list *vl);
+int			hex_conv(va_list *vl, int dcase);
+int			hex_not_zero(unsigned int hex_arg, int dcase, int *len);
+
+/* utils.c */
+int			next_sym_is_percent(char const *format, int *i);
+int			is_conv(char ch);
+int			printf_putstr_fd(char *s, int fd);
+char		*ft_itoa_pos(unsigned int n);
+
+/* packer.c */
+void		**pack_args(int nargs, ...);
 
 #endif
