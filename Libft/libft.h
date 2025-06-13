@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 18:40:28 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/13 17:39:45 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/13 19:32:55 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,13 +126,12 @@ void		ft_lstdelone(t_list *lst, void (*del)(void *));
 void		ft_lstclear(t_list **lst, void (*del)(void *));
 void		ft_lstiter(t_list *lst, void (*f)(void *));
 t_list		*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
-void		ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)());
 
 /* printf functions */
 /* ft_printf.c */
 int			ft_printf(char const *format, ...);
 int			parse_format_str(char const *format, va_list *vl, int *pbytes);
-int			process_percent(char const *format, va_list *vl, int *pbytes, int *i);
+int			process_percent(char const *fstr, va_list *vl, int *pbytes, int *i);
 int			process_not_percent(char const *f, va_list *vl, void **pack);
 int			process_conv(char const *format, va_list *vl, int cpos);
 

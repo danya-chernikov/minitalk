@@ -9,9 +9,9 @@ CFLAGS=-Wall -Werror -Wextra -pedantic-errors -O0 -g3
 CLIENT_OBJS=client.o
 SERVER_OBJS=server.o
 
-all : $(LIBFT) $(CLIENT_NAME) $(SERVER_NAME)
+all : $(LIBFT_NAME) $(CLIENT_NAME) $(SERVER_NAME)
 
-$(LIBFT) : $(LIBFT_NAME)
+$(LIBFT_NAME) : $(LIBFT_NAME)
 	cd $(LIBFT_PATH) && $(MAKE) all # Let's build the Libft
 
 $(CLIENT_NAME) : $(CLIENT_OBJS)
