@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   1.c                                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/13 19:24:17 by dchernik          #+#    #+#             */
+/*   Updated: 2025/06/13 19:24:18 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 /* SIGUSR1 and SIGUSR2
  * These signals are available for user-defined purposes;
  * the kernel never raises them. Processes may use SIGUSR1
