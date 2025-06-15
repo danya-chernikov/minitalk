@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 19:23:57 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/14 16:15:53 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/15 18:27:36 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,14 @@ static void signal_handler(int signo)
 	ft_printf("signo = %d\n", signo);
 }
 
+/*void signal_handler(int signo, siginfo_t *si, void *ucontext)
+{
+
+}*/
+
+/* The default kernel-level limit for the maximum size allowed for the
+ * combined argument (argv) and environment (envp) passed to a new process
+ * via exec() on my machine is 2MB (512 pages × 4096 bytes). */
 int main(int argc, char **argv)
 {
 	ft_printf("Hi! I am %s\n", argv[0]);
