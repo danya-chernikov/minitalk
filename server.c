@@ -6,28 +6,51 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 19:23:57 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/15 18:27:36 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/16 18:30:57 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
 #include <sys/types.h>
-#include <sys/resource.h>
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <errno.h>
 
+unsigned char g_recv_char = 0;
+
+/* The zero byte cannot be received */
 static void signal_handler(int signo)
 {
-	ft_printf("SIGUSR1 was caught\n");
-	ft_printf("signo = %d\n", signo);
+	static unsigned char bits_cnt = 0; // the same as position of the bit to set in the g_recv_char
+
+	/*ft_printf("SIGUSR1 was caught\n");
+	ft_printf("signo = %d\n", signo);*/
+
+
+	if (signo == SIGUSR1) // we need to set a bit in the bits_cnt position from lower bit
+	{
+		g_recv_char |= (1 << bits_cnt);
+	}
+	else if (signo == SIGUSR2)
+	{
+		// do nothing cause we just don't need to set any bit
+	}
+	else
+	{
+		ft_printf("Error: Some other signal was received\n");
+	}
+
+	++bits_cnt;
+
+	if (bits_cnt == 8)
+	{
+		ft_printf("%c", g_recv_char);
+		g_recv_char = 0;
+		bits_cnt = 0;
+	}
 }
-
-/*void signal_handler(int signo, siginfo_t *si, void *ucontext)
-{
-
-}*/
 
 /* The default kernel-level limit for the maximum size allowed for the
  * combined argument (argv) and environment (envp) passed to a new process
@@ -42,19 +65,15 @@ int main(int argc, char **argv)
 
 	ft_printf("argc = %d\n", argc);
 
-	struct rlimit limit;
-	if (getrlimit(RLIMIT_STACK, &limit) == 0)
-	{
-		ft_printf("Stack limit = %ld and %ld\n", limit.rlim_cur, limit.rlim_max);
-	}
-	else
-	{
-		ft_printf("getrlimit failed");
-	}
-
 	if (signal(SIGUSR1, signal_handler) == SIG_ERR)
 	{
 		ft_printf("Cannot handle SIGUSR1\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (signal(SIGUSR2, signal_handler) == SIG_ERR)
+	{
+		ft_printf("Cannot handle SIGUSR2\n");
 		exit(EXIT_FAILURE);
 	}
 
