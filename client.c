@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 19:23:50 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/16 18:15:27 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/16 19:30:42 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,11 @@ int	send_char(pid_t *pid, unsigned char symbol)
 			if (ret)
 				return (1);
 		}
+		// MAYBE MY PRINT IS NOT KEEPING UP WITH THE DATA FLOW?! SHOULD I USE write()?
 		// It seems to me the delay should be at least 1000000/(100*8) = 125 microseconds
-		if (usleep(50000)) // sleep for 50 milliseconds (1/20 of a second)
+		// with 600 microseconds using ft_printf() works perfectly
+		// it seems to me ft_printf() works even stable than pure write()
+		if (usleep(600)) // sleep for 50 milliseconds (1/20 of a second)
 			return (1); // ERROR
 		i++;
 	}
