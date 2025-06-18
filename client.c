@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 19:23:50 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/18 16:43:23 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/18 18:01:55 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,32 +32,28 @@ int	send_char(pid_t *pid, unsigned char symbol)
 {
 	int	i;
 	int	ret;
+	int	signal;
 
 	i = 0;
 	while (i < 8)
 	{
 		if ((int)symbol & (1 << i)) // bit is 1
-		{
-			ret = kill(*pid, SIGUSR1);
-			if (ret)
-				return (1);
-			ack_recv = 0;
-			// waiting for receiving confirmation from the server
-			while (!ack_recv)
-				pause();
-		}
+			signal = SIGUSR1;
 		else // bit is 0
-		{
-			ret = kill(*pid, SIGUSR2);
-			if (ret)
-				return (1);
-			ack_recv = 0;
-			while (!ack_recv)
-				pause();
-		}
+			signal = SIGUSR2;
+
+		ret = kill(*pid, signal);
+		if (ret)
+			return (1);
+		ack_recv = 0;
+		// waiting for receiving confirmation from the server
+		while (!ack_recv)
+			pause();
+
 		// It seems to me the delay should be at least 1000000/(100*8) = 125 microseconds
 		if (usleep(125)) // sleep for 50 milliseconds (1/20 of a second)
 			return (1); // ERROR
+
 		i++;
 	}
 	return (0);
