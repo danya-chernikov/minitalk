@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 19:23:50 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/17 20:03:44 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/18 16:43:23 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,27 +16,6 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <errno.h>
-
-/*
- * typedef struct siginfo_t {
- *     int		si_signo; // signal number
- *     int		si_errno; // errno value (I SUPPOSE I SHOULD USE IT TO ENCODE AT LEAST FOUR CHARACTERS)
- *     int		si_code; signal code
- *     pit_t	si_pid; sending process's PID
- *     uid_t	si_uid; sending process's real UID
- *     int		si_status; exit value or signal ?
- *     clock_t	si_utime; user time consumed | ONLY FOR CHILD PROCESSES
- *     clock_t	si_stime; system time consumed | ONLY FOR CHILD PROCESSES
- *     sigval_t	si_value; signal payload value | ONLY WITH sigqueue() | ONLY IF A SIGNAL WAS SENT USEING sigqueue()
- *     int		si_int; POSIX.1b signal | ONLY WITH sigqueue() | ONLY FOR CHILD | JUST A UNION FIELD OF si_value
- *     void		*si_ptr; POSIX.1b signal | ONLY WITH sigqueue() | CHILD | A UNION FIELD OF si_value
- *     void		*si_addr; ONLY FOR SIGBUS,SIGFPE,SIGILL,SIGSEGV,SIGTRAP memory location that caused fault | ADDRESS OF THE OFFENDING FAULT
- *     int		si_band; ONLY FOR SIGPOLL | band event ?
- *     int		si_fd; ONLY FOR SIGPOLL | file descriptor of the file whose operation completed
- * };
- * */
-
-/* Let's put SIGUSR1 = 1 and SIGUSR2 = 0; */
 
 volatile sig_atomic_t ack_recv = 0;
 
@@ -76,11 +55,8 @@ int	send_char(pid_t *pid, unsigned char symbol)
 			while (!ack_recv)
 				pause();
 		}
-		// MAYBE MY PRINT IS NOT KEEPING UP WITH THE DATA FLOW?! SHOULD I USE write()?
 		// It seems to me the delay should be at least 1000000/(100*8) = 125 microseconds
-		// with 600 microseconds using ft_printf() works perfectly
-		// it seems to me ft_printf() works even stable than pure write()
-		if (usleep(600)) // sleep for 50 milliseconds (1/20 of a second)
+		if (usleep(125)) // sleep for 50 milliseconds (1/20 of a second)
 			return (1); // ERROR
 		i++;
 	}
@@ -98,34 +74,33 @@ int	send_string(pid_t *pid, char *str)
 			return (1); // ERROR
 		i++;
 	}
+	if (send_char(pid, '\0')) // Zero byte goes at the end
+		return (1); // ERROR
+
 	return (0);
 }
 
 int	main(int argc, char **argv)
 {
+	pid_t	pid;
+	char	*msg;
+	int		ret;
+
 	if (argc != 3)
 	{
-		ft_printf("Usage: client [SERVER_PID]\n");
+		ft_printf("Usage: ./client [SERVER_PID]\n");
 		exit(EXIT_FAILURE);
 	}
-	ft_printf("Hi! I am %s\n", argv[0]);
-
-	ft_printf("argc = %d\n", argc);
-
-	pid_t pid = ft_atoi(argv[1]);
-
-	char *msg = argv[2];
-
+	pid = ft_atoi(argv[1]);
+	msg = argv[2];
 	ft_printf("Trying to send the message \"%s\" to the process with PID %d\n", msg, pid);
-
 	if (signal(SIGUSR1, ack_handler) == SIG_ERR)
 	{
 		ft_printf("Cannot handle SIGUSR2\n");
 		exit(EXIT_FAILURE);
 	}
-
-	int ret = kill(pid, 0); // check if we have permission to send a signal
-	if (!ret) // we do have permission
+	ret = kill(pid, 0); // Check if we have permission to send a signal
+	if (!ret) // We do have permission
 	{
 		if (send_string(&pid, msg))
 		{
@@ -138,6 +113,5 @@ int	main(int argc, char **argv)
 		ft_printf("Error: cannot send a signal due to the lack of permission\n");
 		exit(EXIT_FAILURE);
 	}
-
 	return (0);
 }
