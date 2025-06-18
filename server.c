@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 19:23:57 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/16 19:42:54 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/17 22:30:23 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,22 @@
 #include <stdlib.h>
 #include <errno.h>
 
-unsigned char g_recv_char = 0;
+# define MAX_CLIENTS 100
+
+typedef struct s_client_state
+{
+	pit_d pid;
+	unsigned char	cur_char;
+	unsigned char	bits_recv; /* bits received */
+	int				active;
+} t_client_state;
+
+static client_state clients[MAX_CLIENTS];
+
+static client_state *get_client_state(pid_t pid)
+{
+
+}
 
 /* The zero byte cannot be received */
 /* REENTRANCY!!! I need to prohibit
@@ -26,7 +41,8 @@ unsigned char g_recv_char = 0;
  * the signal handler function is working */
 static void signal_handler(int signo, siginfo_t *sinfo, void *ucontext)
 {
-	ucontext = NULL;
+	(void)ucontext;
+	(void)sinfo;
 
 	// the same as position of the bit to set in the g_recv_char
 	static unsigned char bits_cnt = 0;
@@ -44,6 +60,8 @@ static void signal_handler(int signo, siginfo_t *sinfo, void *ucontext)
 		g_recv_char = 0;
 		bits_cnt = 0;
 	}
+	// acknowledge back to client
+	kill(sinfo->si_pid, SIGUSR1);
 }
 
 /* The default kernel-level limit for the maximum size allowed for the
@@ -62,15 +80,18 @@ int main(int argc, char **argv)
 	struct sigaction sig;
 	sig.sa_sigaction = signal_handler;
 	sigemptyset(&sig.sa_mask);
+	// let's block both SIGUSR1 and SIGUSR2 during signal handling
+	sigaddset(&sig.sa_mask, SIGUSR1);
+	sigaddset(&sig.sa_mask, SIGUSR2);
 	sig.sa_flags = SA_SIGINFO;
 
-	if (sigaction(SIGUSR1, &sa, NULL) == -1)
+	if (sigaction(SIGUSR1, &sig, NULL) == -1)
 	{
 		ft_printf("Cannot handle SIGUSR1\n");
 		exit(EXIT_FAILURE);
 	}
 
-	if (sigaction(SIGUSR2, &sa, NULL) == -1)
+	if (sigaction(SIGUSR2, &sig, NULL) == -1)
 	{
 		ft_printf("Cannot handle SIGUSR2\n");
 		exit(EXIT_FAILURE);

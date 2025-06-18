@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 19:23:50 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/16 19:30:42 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/17 20:03:44 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,14 @@
 
 /* Let's put SIGUSR1 = 1 and SIGUSR2 = 0; */
 
+volatile sig_atomic_t ack_recv = 0;
+
+void	ack_handler(int sig)
+{
+	(void)sig;
+	ack_recv = 1;
+}
+
 /* On success returns 0;
  * We use unsigned char cause we want
  * to be able to represent all ASCII table */
@@ -54,12 +62,19 @@ int	send_char(pid_t *pid, unsigned char symbol)
 			ret = kill(*pid, SIGUSR1);
 			if (ret)
 				return (1);
+			ack_recv = 0;
+			// waiting for receiving confirmation from the server
+			while (!ack_recv)
+				pause();
 		}
 		else // bit is 0
 		{
 			ret = kill(*pid, SIGUSR2);
 			if (ret)
 				return (1);
+			ack_recv = 0;
+			while (!ack_recv)
+				pause();
 		}
 		// MAYBE MY PRINT IS NOT KEEPING UP WITH THE DATA FLOW?! SHOULD I USE write()?
 		// It seems to me the delay should be at least 1000000/(100*8) = 125 microseconds
@@ -102,6 +117,12 @@ int	main(int argc, char **argv)
 	char *msg = argv[2];
 
 	ft_printf("Trying to send the message \"%s\" to the process with PID %d\n", msg, pid);
+
+	if (signal(SIGUSR1, ack_handler) == SIG_ERR)
+	{
+		ft_printf("Cannot handle SIGUSR2\n");
+		exit(EXIT_FAILURE);
+	}
 
 	int ret = kill(pid, 0); // check if we have permission to send a signal
 	if (!ret) // we do have permission
