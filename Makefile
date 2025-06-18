@@ -28,10 +28,10 @@ fclean : clean
 
 re : fclean all
 
-client.o : client.c
+client.o : client.c client.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -c client.c
 
-server.o : server.c
+server.o : server.c server.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -c server.c
 
 .PHONY: all clean fclean re libft
