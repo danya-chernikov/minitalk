@@ -4,7 +4,7 @@ LIBFT_PATH=Libft/
 CLIENT_NAME=client
 SERVER_NAME=server
 
-CFLAGS=-Wall -Werror -Wextra -pedantic-errors -O0 -g3
+CFLAGS=-Wall -Werror -Wextra -pedantic-errors -O2
 
 CLIENT_OBJS=client.o
 SERVER_OBJS=server.o

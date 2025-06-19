@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 19:23:50 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/18 19:57:42 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/19 03:15:29 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,14 @@
 #include <stdlib.h>
 #include <errno.h>
 
+/* It is guaranteed to be read and
+ * written atomically, i.e. access
+ * to g_ack_recv cannot be interrupted
+ * by a signal. Furthermore we are
+ * telling the compiler the variable
+ * may change at any time - outside
+ * the normal program flow - so don't
+ * optimize accesses to it */
 volatile sig_atomic_t	g_ack_recv = 0;
 
 int	main(int argc, char **argv)
@@ -49,7 +57,7 @@ int	send_message(pid_t *pid, const char *msg)
 	ft_printf("Sending the message...\n");
 	if (signal(SIGUSR1, ack_handler) == SIG_ERR)
 	{
-		ft_printf("Cannot handle SIGUSR2\n");
+		ft_printf("Error: Cannot register ACK signal handler\n");
 		return (1);
 	}
 	ret = kill(*pid, 0);
@@ -57,13 +65,13 @@ int	send_message(pid_t *pid, const char *msg)
 	{
 		if (send_string(pid, msg))
 		{
-			ft_printf("Error: cannot send a signal\n");
+			ft_printf("Error: Cannot send a signal\n");
 			return (1);
 		}
 	}
 	else
 	{
-		ft_printf("Error: cannot send signal due to lack of permission\n");
+		ft_printf("Error: Cannot send signal due to lack of permission\n");
 		return (1);
 	}
 	ft_printf("Message sent successfully\n");
@@ -102,10 +110,13 @@ int	send_char(pid_t *pid, unsigned char symbol)
 			signal = SIGUSR1;
 		else
 			signal = SIGUSR2;
+		g_ack_recv = 0;
 		ret = kill(*pid, signal);
 		if (ret)
+		{
+			ft_printf("Error: Couldn't send a bit to the server\n");
 			return (1);
-		g_ack_recv = 0;
+		}
 		while (!g_ack_recv)
 			pause();
 		if (usleep(DELAY))

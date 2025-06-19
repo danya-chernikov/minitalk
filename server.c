@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 19:23:57 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/18 20:01:15 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/19 03:21:27 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,12 @@ int	main(int argc, char **argv)
 	sig.sa_flags = SA_SIGINFO;
 	if (sigaction(SIGUSR1, &sig, NULL) == -1)
 	{
-		ft_printf("Cannot handle SIGUSR1\n");
+		ft_printf("Error: Cannot register SIGUSR1 handler\n");
 		exit(EXIT_FAILURE);
 	}
 	if (sigaction(SIGUSR2, &sig, NULL) == -1)
 	{
-		ft_printf("Cannot handle SIGUSR2\n");
+		ft_printf("Error: Cannot register SIGUSR2 handler\n");
 		exit(EXIT_FAILURE);
 	}
 	while (1)
@@ -85,25 +85,26 @@ static void	signal_handler(int signo, siginfo_t *sinfo, void *ucontext)
 
 	(void)ucontext;
 	client = get_client_state(sinfo->si_pid);
-	if (!client)
-		return ;
 	if (signo == SIGUSR1)
 		client->cur_char |= (1 << client->bits_recv);
-	client->bits_recv++;
+
+	++client->bits_recv;
 	if (client->bits_recv == 8)
 	{
 		if (client->cur_char == '\0')
 		{
-			ft_printf("\n");
+			write(STDOUT_FILENO, "\n", 1);
 			client->pid = 0;
 			client->cur_char = 0;
 			client->bits_recv = 0;
 			client->active = 0;
 		}
 		else
-			ft_printf("%c", client->cur_char);
-		client->cur_char = 0;
-		client->bits_recv = 0;
+		{
+			write(STDOUT_FILENO, &client->cur_char, 1);
+			client->cur_char = 0;
+			client->bits_recv = 0;
+		}
 	}
 	kill(sinfo->si_pid, SIGUSR1);
 }
