@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/18 20:07:52 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/18 23:48:25 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/19 15:20:31 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ typedef struct s_client_state
 }	t_client_state;
 
 # define MAX_CLIENTS	100
-# define LOG_FILE_NAME	"server.log"
 
 static t_client_state	*get_client_state(pid_t pid);
 static void				signal_handler(int signo, siginfo_t *sinfo, void *uctx);

@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 19:23:57 by dchernik          #+#    #+#             */
-/*   Updated: 2025/06/19 03:21:27 by dchernik         ###   ########.fr       */
+/*   Updated: 2025/06/19 16:00:44 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,6 @@ static void	signal_handler(int signo, siginfo_t *sinfo, void *ucontext)
 	client = get_client_state(sinfo->si_pid);
 	if (signo == SIGUSR1)
 		client->cur_char |= (1 << client->bits_recv);
-
 	++client->bits_recv;
 	if (client->bits_recv == 8)
 	{
